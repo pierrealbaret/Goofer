@@ -2,10 +2,6 @@ import React, {Component} from 'react';
 
 import Goofer from '../factory/Goofer';
 
-const capybaraImg = (<div style="display:none;">
-  <img id="source" src="https://mdn.mozillademos.org/files/5397/rhino.jpg" width="300" height="227" />
-</div>);
-
 class Map extends Component {
   state = {
     colors: ['#b6bbc2', '#ebeced'],
@@ -14,15 +10,13 @@ class Map extends Component {
 
   componentDidMount() {
     this.addGoofer(0, this.props.nbCase - 1);
-    this.updateCanvas();
+    setInterval(this.updateCanvas.bind(this), 3000);
   }
 
   addGoofer(rangeMin, rangeMax) {
     const goofer = new Goofer(rangeMin, rangeMax);
-    console.log('addGoofer', goofer, this.state.gooferList.push(goofer));
     const newGooferList = this.state.gooferList;
     newGooferList.push(goofer);
-    console.log('newGooferList', newGooferList);
     this.setState({ gooferList: newGooferList });
   }
 
@@ -36,16 +30,41 @@ class Map extends Component {
   }
 
   updateCanvas() {
-    console.log(this.props);
     const ctx = this.refs.canvas.getContext('2d');
     for(let index = 0; index <= this.props.nbCase; index ++) {
       this.setColumns(ctx, index)
     }
-    console.log('this.state.gooferList', this.state.gooferList);
-    this.state.gooferList.map((Goofer) => {
-      console.log('updateCanvas', Goofer);
+    const newGooferList = this.state.gooferList.map((Goofer) => {
+      const newDirection = this.outOfBoundary(Goofer);
+      console.log('newDirection', newDirection);
+      Goofer.direction = newDirection;
+      Goofer.movePosition();
       this.moveGoofer(ctx, Goofer.x, Goofer.y);
+      return Goofer;
     });
+    this.setState({gooferList: newGooferList});
+  }
+
+  outOfBoundary(Goofer) {
+    let direction = { up: 'up', down: 'down', left: 'left', right: 'right' };
+    // 0-0 10-0 0-10 10-10
+    if(Goofer.x === 0) {
+      delete direction.left;
+    }
+    if(Goofer.x === 9) {
+      delete direction.right;
+    }
+    if(Goofer.y === 0) {
+      delete direction.up;
+    }
+
+    if(Goofer.y === 9) {
+      delete direction.down;
+    }
+    console.log('direction', direction)
+    const keys = Object.keys(direction);
+    return direction[keys[ keys.length * Math.random() << 0]];
+    // return direction[Math.floor(Math.random()*direction.length)];
   }
 
   moveGoofer(ctx, x, y) {
@@ -56,7 +75,6 @@ class Map extends Component {
     imageObj1.onload = function() {
       ctx.drawImage(imageObj1, x*itemHeight, y*itemWidth, itemHeight, itemWidth);
     };
-
   }
 
   render() {

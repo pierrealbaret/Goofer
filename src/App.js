@@ -6,7 +6,7 @@ import Map from './container/Map';
 function App() {
   return (
     <div className="App">
-      <Map nbCase={10} height={750} width={750} />
+      <Map nbCase={10} numberOfGoofer={5} height={750} width={750} />
     </div>
   );
 }

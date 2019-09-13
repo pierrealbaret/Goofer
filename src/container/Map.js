@@ -9,7 +9,9 @@ class Map extends Component {
   };
 
   componentDidMount() {
-    this.addGoofer(0, this.props.nbCase - 1);
+    for(let i=0; i<this.props.numberOfGoofer; i+=1) {
+        this.addGoofer(0, this.props.nbCase - 1);
+    }
     setInterval(this.updateCanvas.bind(this), 3000);
   }
 
@@ -36,7 +38,6 @@ class Map extends Component {
     }
     const newGooferList = this.state.gooferList.map((Goofer) => {
       const newDirection = this.outOfBoundary(Goofer);
-      console.log('newDirection', newDirection);
       Goofer.direction = newDirection;
       Goofer.movePosition();
       this.moveGoofer(ctx, Goofer.x, Goofer.y);
@@ -47,7 +48,6 @@ class Map extends Component {
 
   outOfBoundary(Goofer) {
     let direction = { up: 'up', down: 'down', left: 'left', right: 'right' };
-    // 0-0 10-0 0-10 10-10
     if(Goofer.x === 0) {
       delete direction.left;
     }
@@ -61,10 +61,8 @@ class Map extends Component {
     if(Goofer.y === 9) {
       delete direction.down;
     }
-    console.log('direction', direction)
     const keys = Object.keys(direction);
     return direction[keys[ keys.length * Math.random() << 0]];
-    // return direction[Math.floor(Math.random()*direction.length)];
   }
 
   moveGoofer(ctx, x, y) {
